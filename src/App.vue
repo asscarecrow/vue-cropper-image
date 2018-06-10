@@ -1,17 +1,21 @@
 <template>
   <div id="app">
-    <img src="./assets/logo.png">
-    <HelloWorld/>
+    <cropper :src='src' :aspectRatio="16/9"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld'
-
+import cropper from './components/cropper'
+const srcPath = require('@/assets/clock.jpg');
 export default {
   name: 'App',
+  data() {
+    return  {
+      src: srcPath
+    }
+  },
   components: {
-    HelloWorld
+    cropper
   }
 }
 </script>
