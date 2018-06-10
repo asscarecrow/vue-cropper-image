@@ -10,8 +10,8 @@
     <div class="core" :style="wrapperStyle">
       <img :src="src" :id='id'>
     </div>
-    <div class="preview-wrap" v-show="showPreview">
-      <div ref="preview" class="preview"  @click="showPreview=false"></div>
+    <div class="preview-wrap" v-show="showPreview" @click="showPreview=false">
+      <div ref="preview" class="preview"></div>
     </div>
 </section>
 </template>
@@ -75,7 +75,7 @@ export default {
             'max-width: none;' +
             'max-height: none;'
           );
-          $preview.appendChild(clone);
+          $preview.appendChild(clone.cloneNode());
         },
         crop: function (e) {
           $previewImg = document.getElementById(_this.id);
@@ -86,12 +86,11 @@ export default {
           var boxData = cropper.getCropBoxData();
           $preview.style.width = boxData.width + 'px';
           $preview.style.height = boxData.height + 'px';
-
+          $preview.style.marginLeft = -boxData.width/2 + 'px';
+          $preview.style.marginTop  = -boxData.height/2 + 'px';
           var previewAspectRatio = data.width / data.height;
-          var previewWidth = $previewImg.offsetWidth;
-          var previewHeight = previewWidth / previewAspectRatio;
-          var imageScaledRatio = data.width / previewWidth;
-          $previewImg.style.height = previewHeight + 'px';
+          var imageScaledRatio = data.width / boxData.width;
+          $previewImg.style.height = boxData.height + 'px';
           $previewImg.style.width = imageData.naturalWidth / imageScaledRatio + 'px';
           $previewImg.style.height = imageData.naturalHeight / imageScaledRatio + 'px';
           $previewImg.style.marginLeft = -data.x / imageScaledRatio + 'px';
@@ -127,5 +126,5 @@ export default {
 .crop-wrapper .model {position: absolute;left: 0;right: 0;bottom: 0;background-color: rgba(0,0,0,0.5);}
 .crop-wrapper .core>img {max-width: 100%}
 .crop-wrapper .preview-wrap {position: fixed;top: 0;left: 0;right: 0;bottom: 0;margin: 0;background-color: rgba(0,0,0,0.7);z-index: 999;}
-.crop-wrapper .preview-wrap .preview {position: absolute;top: 50%;left: 50%;margin-top: -50%;margin-left: -50%;}
+.crop-wrapper .preview-wrap .preview {position: absolute;top: 50%;left: 50%;}
 </style>
