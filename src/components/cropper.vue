@@ -3,7 +3,7 @@
   <header class="bar" ref="bar">
     <button class="btn btn-preview" @click="doPreview">预览</button>
     <button class="btn btn-yes" @click="yes">确定</button>
-    <button class="btn btn-cancel">取消</button>
+    <button class="btn btn-cancel" @click="cancel">取消</button>
   </header>
 
     <!-- <div class="model" :style="{top: modelTop}"></div> -->
@@ -16,6 +16,7 @@
 </section>
 </template>
 <script>
+import axios from "axios";
 import Cropper from "cropperjs"
 import 'cropperjs/dist/cropper.css';
 /* TODO:
@@ -34,8 +35,16 @@ export default {
     },
     aspectRatio: Number,
     preview: '.crop-wrapper .preview',
+    name: {
+      type: String,
+      default: 'src'
+    },
     src: {
       type: String
+    },
+    url: {
+      type: String,
+      default: ''
     }
   },
   data() {return {
@@ -125,8 +134,38 @@ export default {
       }
     },
     yes() {
-      let data = $cropper.getCroppedCanvas().toDataURL();
-
+      var _this = this;
+      _this.$emit('beforeUpload');
+      /* let url = $cropper.getCroppedCanvas().toDataURL('image/jpg');
+      let formData = new FormData();
+      formData.append(_this.name, url);
+      formData.append('filename',"pocket-watch-3156771_1920.jpg");
+      axios.post(_this.url, formData)
+        .then(data => {
+          _this.$emit('afterUpload', data);
+          console.log(data);
+        })
+        .catch(data => {
+          _this.$emit('uploadError', data);
+          console.error(data);
+        }) */
+      $cropper.getCroppedCanvas().toBlob(blob => {
+        var formData = new FormData();
+        formData.append(_this.name, blob);
+        formData.append('filename', 'demo.jpg')
+        axios.post(_this.url, formData)
+        .then(data => {
+          _this.$emit('afterUpload', data);
+          console.log(data);
+        })
+        .catch(data => {
+          _this.$emit('uploadError', data);
+          console.error(data);
+        })
+      });
+    },
+    cancel() {
+      $cropper.reset();
     }
   }
 }
