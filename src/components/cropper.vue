@@ -2,7 +2,7 @@
 <section class="crop-wrapper">
   <header class="bar" ref="bar">
     <button class="btn btn-preview" @click="doPreview">预览</button>
-    <button class="btn btn-yes">确定</button>
+    <button class="btn btn-yes" @click="yes">确定</button>
     <button class="btn btn-cancel">取消</button>
   </header>
 
@@ -64,9 +64,13 @@ export default {
       let _this = this;
       $preview = this.$refs.preview;
       let default_config = {
-        ready: function () {
+        response: true,
+        ready: function (e) {
           var clone = this.cloneNode();
+          var cropper = this.cropper;
+          var boxData = cropper.getCropBoxData();
           clone.className = ''
+          clone.id = `${_this.id}_clone`
           clone.style.cssText = (
             'display: block;' +
             'width: 100%;' +
@@ -75,22 +79,19 @@ export default {
             'max-width: none;' +
             'max-height: none;'
           );
-          $preview.appendChild(clone.cloneNode());
+          $preview.appendChild(clone);
+          _this.setPreviewStyle(boxData);
         },
         crop: function (e) {
-          $previewImg = document.getElementById(_this.id);
+          $previewImg = document.getElementById(`${_this.id}_clone`);
           if(!$previewImg) return false;
           var data = e.detail;
           var cropper = this.cropper;
           var imageData = cropper.getImageData();
           var boxData = cropper.getCropBoxData();
-          $preview.style.width = boxData.width + 'px';
-          $preview.style.height = boxData.height + 'px';
-          $preview.style.marginLeft = -boxData.width/2 + 'px';
-          $preview.style.marginTop  = -boxData.height/2 + 'px';
+          _this.setPreviewStyle(boxData);
           var previewAspectRatio = data.width / data.height;
           var imageScaledRatio = data.width / boxData.width;
-          $previewImg.style.height = boxData.height + 'px';
           $previewImg.style.width = imageData.naturalWidth / imageScaledRatio + 'px';
           $previewImg.style.height = imageData.naturalHeight / imageScaledRatio + 'px';
           $previewImg.style.marginLeft = -data.x / imageScaledRatio + 'px';
@@ -99,7 +100,15 @@ export default {
       }
       $cropper = new Cropper(document.getElementById(this.id), default_config);
       this.setWrapperStyle();
-
+      /* window.addEventListener('resize', _.debounce(function(){
+          _this.setWrapperStyle();
+      }, 50)) */
+    },
+    setPreviewStyle(boxData) {
+      $preview.style.width = boxData.width + 'px';
+      $preview.style.height = boxData.height + 'px';
+      $preview.style.left = boxData.left + 'px';
+      $preview.style.top = (parseInt(boxData.top) + parseInt(this.modelTop)) + 'px';
     },
     setWrapperStyle() {
       let w = window.innerWidth;
@@ -114,6 +123,10 @@ export default {
         // this.previewStyle = {width: `${box.width}px`, height: `${box.height}px`};
         this.showPreview = true;
       }
+    },
+    yes() {
+      let data = $cropper.getCroppedCanvas().toDataURL();
+
     }
   }
 }
@@ -126,5 +139,5 @@ export default {
 .crop-wrapper .model {position: absolute;left: 0;right: 0;bottom: 0;background-color: rgba(0,0,0,0.5);}
 .crop-wrapper .core>img {max-width: 100%}
 .crop-wrapper .preview-wrap {position: fixed;top: 0;left: 0;right: 0;bottom: 0;margin: 0;background-color: rgba(0,0,0,0.7);z-index: 999;}
-.crop-wrapper .preview-wrap .preview {position: absolute;top: 50%;left: 50%;}
+.crop-wrapper .preview-wrap .preview {position: absolute;top: 50%;left: 50%;overflow: hidden;}
 </style>
