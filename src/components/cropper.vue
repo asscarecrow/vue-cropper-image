@@ -45,7 +45,7 @@
 // import axios from 'axios';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
-import '@/assets/font/iconfont.js';
+// import '@/assets/font/iconfont.js';
 /* TODO:
 1. 窗口调整的时候，动态计算可编辑区域的长宽高
  */
@@ -82,7 +82,7 @@ export default {
   data() {
     return {
       modelTop: 0,
-      show: false,
+      show: true,
       showPreview: false,
       wrapperStyle: {'width': '100%', 'height': '100%'},
       previewStyle: {'width': '500px', 'height': '300px'},

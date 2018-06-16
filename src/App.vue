@@ -1,7 +1,7 @@
 <template>
   <div id="app">
-    <input type="file" name="img" @change="setSrc">
-    <cropper :src='src' :aspectRatio="16/9"/>
+    <!-- <input type="file" name="img" @change="setSrc"> -->
+    <cropper :src='src' :aspectRatio="16/9" :show="true"/>
   </div>
 </template>
 
@@ -20,7 +20,7 @@ export default {
   },
   methods: {
     setSrc(e) {
-      this.src = e.target.value;
+      this.src = e.target.files[0];
     }
   }
 }

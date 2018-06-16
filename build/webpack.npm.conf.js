@@ -1,7 +1,6 @@
 'use strict'
 const path = require('path')
 const utils = require('./utils')
-const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 
 function resolve (dir) {
@@ -17,7 +16,9 @@ module.exports = {
   },
   output: {
     path: path.resolve(__dirname, '../dist/dist'),
-    filename: 'vueCropper.js'
+    filename: '[name].js',
+    library: 'VueCorepper',
+    libraryTarget: "umd" //一般都会选择umd
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
