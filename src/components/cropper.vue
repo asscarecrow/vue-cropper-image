@@ -44,8 +44,9 @@
 <script>
 // import axios from 'axios';
 import Cropper from 'cropperjs';
-import 'cropperjs/dist/cropper.css';
-// import '@/assets/font/iconfont.js';
+require('cropperjs/dist/cropper.css')
+// require('css-loader!cropperjs/dist/cropper.css')
+import '../assets/font/iconfont.js';
 /* TODO:
 1. 窗口调整的时候，动态计算可编辑区域的长宽高
  */
