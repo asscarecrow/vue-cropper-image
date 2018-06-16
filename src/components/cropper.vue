@@ -1,5 +1,5 @@
 <template>
-<section class="crop-wrapper">
+<section class="crop-wrapper" v-show="show">
   <header class="bar" ref="bar">
 
     <div class="btn-wrap">
@@ -34,7 +34,7 @@
 
     <!-- <div class="model" :style="{top: modelTop}"></div> -->
     <div class="core" :style="wrapperStyle">
-      <img :src="src" :id='id'>
+      <img :src="src" :id='id' crossOrigin="anonymous">
     </div>
     <div class="preview-wrap" v-show="showPreview" @click="showPreview=false">
       <div ref="preview" class="preview"></div>
@@ -42,14 +42,12 @@
 </section>
 </template>
 <script>
-import axios from "axios";
-import Cropper from "cropperjs"
+// import axios from 'axios';
+import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import '@/assets/font/iconfont.js';
 /* TODO:
 1. 窗口调整的时候，动态计算可编辑区域的长宽高
-2. 预览功能
-3. 顶部放大缩小功能的样式
  */
 var $cropper = null;
 var $preview = null;
@@ -61,7 +59,14 @@ export default {
       default: 'cropImg'
     },
     aspectRatio: Number,
-    preview: '.crop-wrapper .preview',
+    minCropBoxWidth: Number,
+    minCropBoxHeight: Number,
+    autoCropArea: Number,
+    cropBoxResizable: Boolean,
+    dragMode: {
+      type: String,
+      default: 'crop'
+    },
     name: {
       type: String,
       default: 'src'
@@ -74,26 +79,62 @@ export default {
       default: ''
     }
   },
-  data() {return {
-    modelTop: 0,
-    showPreview: false,
-    wrapperStyle: {'width': '100%', 'height': '100%'},
-    previewStyle: {'width': '500px', 'height': '300px'},
-    isH5: true
-  }},
+  data() {
+    return {
+      modelTop: 0,
+      show: false,
+      showPreview: false,
+      wrapperStyle: {'width': '100%', 'height': '100%'},
+      previewStyle: {'width': '500px', 'height': '300px'},
+      isH5: true
+    };
+  },
   computed: {
     config() {
       let config = {};
-      config.preview = this.preview;
+      config.dragMode = this.dragMode;
       if(typeof this.aspectRatio === 'number') {
         config.aspectRatio = this.aspectRatio;
+      }
+      if(typeof this.minCropBoxWidth === 'number') {
+        config.minCropBoxWidth = this.minCropBoxWidth;
+      }
+      if(typeof this.minCropBoxHeight === 'number') {
+        config.minCropBoxHeight = this.minCropBoxHeight;
+      }
+      if(typeof this.autoCropArea === 'number') {
+        config.autoCropArea = this.autoCropArea;
+      }
+      if(typeof this.cropBoxResizable === 'boolean') {
+        config.cropBoxResizable = this.cropBoxResizable;
       }
       return config;
     }
   },
+  watch: {
+    'src': function(val) {
+      if(val && $cropper) {
+        $cropper.replace(val);
+        this.show = true;
+        try {
+          $previewImg.src = val;
+        } catch (e) {
+
+        }
+      }else{
+        this.show = false;
+      }
+    },
+    'show': function(val) {
+      if(val) {
+        let $bar = this.$refs.bar;
+        this.$nextTick(function() {
+          this.modelTop = $bar.clientHeight;
+        });
+      }
+    }
+  },
   mounted() {
-    let $bar = this.$refs.bar;
-    this.modelTop = $bar.clientHeight;
     let winWidth = document.body.clientWidth;
     if(winWidth > 751) {
       // 小于ipad都认为是mobile
@@ -105,52 +146,57 @@ export default {
     init() {
       let _this = this;
       $preview = this.$refs.preview;
-      let default_config = {
+      let defaultConfig = {
         response: true,
-        ready: function (e) {
-          var clone = this.cloneNode();
+        ready: function(e) {
           var cropper = this.cropper;
           var boxData = cropper.getCropBoxData();
-          clone.className = ''
-          clone.id = `${_this.id}_clone`
-          clone.style.cssText = (
-            'display: block;' +
-            'width: 100%;' +
-            'min-width: 0;' +
-            'min-height: 0;' +
-            'max-width: none;' +
-            'max-height: none;'
-          );
-          $preview.appendChild(clone);
-          _this.setPreviewStyle(boxData);
+          var detail = cropper.getData();
+          if(document.getElementById(`${_this.id}_clone`) === null) {
+            var clone = this.cloneNode();
+            clone.className = '';
+            clone.id = `${_this.id}_clone`;
+            clone.style.cssText = (
+              'display: block;' +
+              'width: 100%;' +
+              'min-width: 0;' +
+              'min-height: 0;' +
+              'max-width: none;' +
+              'max-height: none;'
+            );
+            $preview.appendChild(clone);
+          }else{
+            document.getElementById(`${_this.id}_clone`).setAttribute('src', _this.src);
+          }
+          _this.setPreviewStyle(boxData, detail);
         },
-        crop: function (e) {
-          $previewImg = document.getElementById(`${_this.id}_clone`);
-          if(!$previewImg) return false;
-          var data = e.detail;
-          var cropper = this.cropper;
-          var imageData = cropper.getImageData();
-          var boxData = cropper.getCropBoxData();
-          _this.setPreviewStyle(boxData);
-          var previewAspectRatio = data.width / data.height;
-          var imageScaledRatio = data.width / boxData.width;
-          $previewImg.style.width = imageData.naturalWidth / imageScaledRatio + 'px';
-          $previewImg.style.height = imageData.naturalHeight / imageScaledRatio + 'px';
-          $previewImg.style.marginLeft = -data.x / imageScaledRatio + 'px';
-          $previewImg.style.marginTop = -data.y / imageScaledRatio + 'px';
+        crop: function(e) {
+          var boxData = $cropper.getCropBoxData();
+          _this.setPreviewStyle(boxData, e.detail);
         }
-      }
-      $cropper = new Cropper(document.getElementById(this.id), default_config);
+      };
+      let conf = Object.assign({}, defaultConfig, this.config);
+      $cropper = new Cropper(document.getElementById(this.id), conf);
       this.setWrapperStyle();
       /* window.addEventListener('resize', _.debounce(function(){
           _this.setWrapperStyle();
       }, 50)) */
     },
-    setPreviewStyle(boxData) {
+    setPreviewStyle(boxData, data) {
+      $previewImg = document.getElementById(`${this.id}_clone`);
+
       $preview.style.width = boxData.width + 'px';
       $preview.style.height = boxData.height + 'px';
       $preview.style.left = boxData.left + 'px';
       $preview.style.top = (parseInt(boxData.top) + parseInt(this.modelTop)) + 'px';
+
+      if(!$previewImg) return false;
+      var imageData = $cropper.getImageData();
+      var imageScaledRatio = data.width / boxData.width;
+      $previewImg.style.width = imageData.naturalWidth / imageScaledRatio + 'px';
+      $previewImg.style.height = imageData.naturalHeight / imageScaledRatio + 'px';
+      $previewImg.style.marginLeft = -data.x / imageScaledRatio + 'px';
+      $previewImg.style.marginTop = -data.y / imageScaledRatio + 'px';
     },
     setWrapperStyle() {
       let w = window.innerWidth;
@@ -168,24 +214,28 @@ export default {
     },
     yes() {
       var _this = this;
-      _this.$emit('beforeUpload');
-      /* let url = $cropper.getCroppedCanvas().toDataURL('image/jpg');
-      let formData = new FormData();
-      formData.append(_this.name, url);
-      formData.append('filename',"pocket-watch-3156771_1920.jpg");
-      axios.post(_this.url, formData)
+      let canvas = $cropper.getCroppedCanvas();
+      _this.$emit('croped', canvas);
+      _this.show = false;
+      // if(!_this.url) return false;
+      // let url = $cropper.getCroppedCanvas().toDataURL('image/jpg');
+      // let formData = new FormData();
+      // formData.append('src', url);
+      // formData.append('filename', 'pocket-watch-3156771_1920.jpg');
+      // formData.append('Content-Type', 'image/jpeg');
+      /* axios.post(_this.url, formData, {withCredentials: true})
         .then(data => {
-          _this.$emit('afterUpload', data);
+          _this.$emit('uploaded', data);
           console.log(data);
         })
         .catch(data => {
           _this.$emit('uploadError', data);
           console.error(data);
         }) */
-      $cropper.getCroppedCanvas().toBlob(blob => {
+      /* $cropper.getCroppedCanvas().toBlob(blob => {
         var formData = new FormData();
         formData.append(_this.name, blob);
-        formData.append('filename', 'demo.jpg')
+        // formData.append('filename', 'demo.jpg');
         axios.post(_this.url, formData)
         .then(data => {
           _this.$emit('afterUpload', data);
@@ -195,10 +245,11 @@ export default {
           _this.$emit('uploadError', data);
           console.error(data);
         })
-      });
+      }); */
     },
     cancel() {
       $cropper.reset();
+      this.show = false;
     },
     zoomIn() {
       $cropper.zoom(0.1);
@@ -207,10 +258,10 @@ export default {
       $cropper.zoom(-0.1);
     }
   }
-}
+};
 </script>
 <style>
-.crop-wrapper {position: fixed;top: 0;left: 0;bottom: 0;right: 0;}
+.crop-wrapper {position: fixed;top: 0;left: 0;bottom: 0;right: 0;z-index: 990}
 .crop-wrapper .bar {position: relative;padding: 8px 22px;background: #fff;font-size: 14px;}
 .crop-wrapper .bar button {outline: none;}
 .crop-wrapper .model {position: absolute;left: 0;right: 0;bottom: 0;background-color: rgba(0,0,0,0.5);}
@@ -220,12 +271,14 @@ export default {
 
 .crop-wrapper .bar .btn-wrap {position: absolute; right: 22px;top: 6px;}
 .crop-wrapper .btn-wrap .btn {padding: 6px 14px;margin-left: 7px;margin-right: 7px;border-radius: 3px;color: #fff;border: 1px solid #dcdfe6;}
-.crop-wrapper .btn-wrap .btn-preview {color: #409eff;background: #ecf5ff;border-color: #b3d8ff;}
-.crop-wrapper .btn-wrap .btn-yes {color: #67c23a;background: #f0f9eb;border-color: #c2e7b0;}
+.crop-wrapper .btn-wrap .btn-preview,
+.crop-wrapper .btn-wrap .btn-yes {color: #409eff;background: #ecf5ff;border-color: #b3d8ff;}
+/* .crop-wrapper .btn-wrap .btn-yes {color: #67c23a;background: #f0f9eb;border-color: #c2e7b0;} */
 .crop-wrapper .btn-wrap .btn-cancel {color: #909399;background: #f4f4f5;border-color: #d3d4d6;}
 .crop-wrapper .btn-wrap .btn:hover {color: #fff;}
-.crop-wrapper .btn-wrap .btn-preview:hover {background: #409eff;}
-.crop-wrapper .btn-wrap .btn-yes:hover {background: #67c23a;}
+.crop-wrapper .btn-wrap .btn-preview:hover,
+.crop-wrapper .btn-wrap .btn-yes:hover {background: #409eff;}
+/* .crop-wrapper .btn-wrap .btn-yes:hover {background: #67c23a;} */
 .crop-wrapper .btn-wrap .btn-cancel:hover {background: #909399;}
 
 .crop-wrapper .control .btn {padding: 6px 14px;color: #fff;background-color: #409eff;border-color: #409eff;}
@@ -236,6 +289,6 @@ export default {
 .crop-wrapper .crop-icon {width: 1em; height: 1em;vertical-align: -0.15em;fill: currentColor;overflow: hidden;}
 
 @media screen and (max-width: 752px) {
-.crop-wrapper .bar .btn-wrap {position: relative;right: auto;top: auto;font-size: 12px;}
+.crop-wrapper .bar .btn-wrap {position: relative;right: auto;top: auto;font-size: 12px;text-align: center;}
 }
 </style>

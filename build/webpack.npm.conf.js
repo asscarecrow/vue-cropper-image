@@ -13,14 +13,11 @@ function resolve (dir) {
 module.exports = {
   context: path.resolve(__dirname, '../'),
   entry: {
-    index: './src/main.js'
+    index: './src/components/cropper.vue'
   },
   output: {
-    path: config.build.assetsRoot,
-    filename: '[name].js',
-    publicPath: process.env.NODE_ENV === 'production'
-      ? config.build.assetsPublicPath
-      : config.dev.assetsPublicPath
+    path: path.resolve(__dirname, '../dist/dist'),
+    filename: 'vueCropper.js'
   },
   resolve: {
     extensions: ['.js', '.vue', '.json'],
