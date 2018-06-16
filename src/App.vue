@@ -6,7 +6,8 @@
 </template>
 
 <script>
-import cropper from './components/cropper'
+// import cropper from './components/cropper'
+import cropper from 'vue-cropper-image';
 // const srcPath = require('@/assets/clock.jpg');
 export default {
   name: 'App',
