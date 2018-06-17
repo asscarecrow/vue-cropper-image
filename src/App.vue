@@ -8,12 +8,13 @@
 <script>
 // import cropper from './components/cropper'
 import cropper from 'vue-cropper-image';
-// const srcPath = require('@/assets/clock.jpg');
+const srcPath = require('@/assets/clock.jpg');
 export default {
   name: 'App',
   data() {
     return  {
-      src: 'https://getbootstrap.com/docs/4.1/assets/img/bootstrap-stack.png'
+      // src: 'https://getbootstrap.com/docs/4.1/assets/img/bootstrap-stack.png'
+      src: srcPath
     }
   },
   components: {
