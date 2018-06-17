@@ -2,6 +2,8 @@
 
 > a vue component wrapper for [cropperjs](https://github.com/fengyuanchen/cropperjs).
 
+[![NPM](https://nodei.co/npm/vue-cropper-image.png?mini=true)](https://nodei.co/npm/vue-cropper-image/)
+
 ## Build Setup
 
 ``` bash
@@ -37,10 +39,11 @@ Some component options as follow:
 #### croped
   - params: canvas
   when pressing yes btn ,it will dispatch this event.it return the result of `cropper.getCroppedCanvas()` as it's params.
-TODO:
-- support choose local image file
-- support xhr upload
 
 ## Support
 pc and H5 website
+
+## TODO:
+- support choose local image file
+- support xhr upload
 
