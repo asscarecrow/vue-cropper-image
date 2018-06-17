@@ -283,7 +283,7 @@ export default {
 /* .crop-wrapper .btn-wrap .btn-yes:hover {background: #67c23a;} */
 .crop-wrapper .btn-wrap .btn-cancel:hover {background: #909399;}
 
-.crop-wrapper .control .btn {padding: 6px 14px;color: #fff;background-color: #409eff;border-color: #409eff;}
+.crop-wrapper .control .btn {margin: 0;padding: 6px 14px;color: #fff;background-color: #409eff;border:1px solid #409eff;}
 .crop-wrapper .control .btn:hover {background-color: #0062cc;border-color: #005cbf;}
 .crop-wrapper .control .btn-enlarge {border-top-left-radius: 3px;border-bottom-left-radius: 3px;border-right-color: #74b3f7;}
 .crop-wrapper .control .btn-reduce {border-top-right-radius: 3px;border-bottom-right-radius: 3px;}

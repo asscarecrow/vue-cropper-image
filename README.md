@@ -1,6 +1,6 @@
 # vue-cropperjs
 
-> a vue component wrapper for cropperjs. https://morepainmoregain.github.io/vue-cropper-image/
+> a vue component wrapper for [cropperjs](https://github.com/fengyuanchen/cropperjs).
 
 ## Build Setup
 
