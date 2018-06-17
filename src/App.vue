@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <!-- <input type="file" name="img" @change="setSrc"> -->
-    <cropper :src='src' :aspectRatio="16/9" :show="true"/>
+    <cropper :src='src' :aspectRatio="16/9"/>
   </div>
 </template>
 

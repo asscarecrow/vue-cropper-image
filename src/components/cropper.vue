@@ -216,7 +216,7 @@ export default {
     yes() {
       var _this = this;
       let canvas = $cropper.getCroppedCanvas();
-      _this.$emit('croped', canvas);
+      _this.$emit('cropped', canvas);
       _this.show = false;
       // if(!_this.url) return false;
       // let url = $cropper.getCroppedCanvas().toDataURL('image/jpg');
@@ -250,6 +250,7 @@ export default {
     },
     cancel() {
       $cropper.reset();
+      this.$emit('cancel');
       this.show = false;
     },
     zoomIn() {

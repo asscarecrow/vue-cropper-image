@@ -1,8 +1,7 @@
 # vue-cropperjs
 
-> a vue component wrapper for cropperjs
+> a vue component wrapper for [cropperjs](https://github.com/fengyuanchen/cropperjs).
 
-**Not completed yet**
 ## Build Setup
 
 ``` bash
@@ -15,17 +14,31 @@ npm run dev
 # build for production with minification
 npm run build
 
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run e2e tests
-npm run e2e
-
-# run all tests
-npm test
 ```
+## Usage
+
+```
+import cropper from 'vue-cropper-image';
+
+<cropper :src='src' :aspectRatio="16/9" :show="true"/>
+```
+## Options
+Most options of [cropperjs](https://github.com/fengyuanchen/cropperjs) is supported.
+Some component options as follow:
+
+#### src
+  - type: String
+  - default: NaN
+  Define the path of image that need to be cropped.
+> **[Notice]** Once the value of the src changing, the cropper wrapper will be show
+
+## Methods
+
+#### croped
+  - params: canvas
+  when pressing yes btn ,it will dispatch this event.it return the result of `cropper.getCroppedCanvas()` as it's params.
+TODO:
+- support choose local image file
+- support xhr upload
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
