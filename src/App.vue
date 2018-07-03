@@ -1,6 +1,10 @@
 <template>
   <div id="app">
-    <!-- <input type="file" name="img" @change="setSrc"> -->
+
+    <div class="">
+      <a @click="setExist" >crop an existing image</a>
+      <a ><input type="file" name="img" @change="setSrc"></a>
+    </div>
     <cropper :src='src' :aspectRatio="16/9"/>
   </div>
 </template>
@@ -14,13 +18,16 @@ export default {
   data() {
     return  {
       // src: 'https://getbootstrap.com/docs/4.1/assets/img/bootstrap-stack.png'
-      src: srcPath
+      src: ''
     }
   },
   components: {
     cropper
   },
   methods: {
+    setExist() {
+      this.src = srcPath;
+    },
     setSrc(e) {
       this.src = e.target.files[0];
     }
