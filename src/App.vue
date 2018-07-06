@@ -1,11 +1,15 @@
 <template>
   <div id="app">
 
-    <div class="">
-      <a @click="setExist" >crop an existing image</a>
-      <a ><input type="file" name="img" @change="setSrc"></a>
+    <div class="btn-wrap">
+      <a @click="setExist" class="btn" href="javascript:;">crop an existing image</a>
+      <a class="btn" href="javascript:;">upload an new image<input class="file" type="file" name="img" @change="setSrc"></a>
     </div>
-    <cropper :src='src' :aspectRatio="16/9"/>
+    <cropper :src='src' :cropBoxResizable="false" :aspectRatio="16/9" ref="cropper" @cropped="cropped"/>
+
+    <div class="preview">
+      <img :src="cropedSrc">
+    </div>
   </div>
 </template>
 
@@ -18,7 +22,8 @@ export default {
   data() {
     return  {
       // src: 'https://getbootstrap.com/docs/4.1/assets/img/bootstrap-stack.png'
-      src: ''
+      src: '',
+      cropedSrc: ''
     }
   },
   components: {
@@ -29,7 +34,11 @@ export default {
       this.src = srcPath;
     },
     setSrc(e) {
-      this.src = e.target.files[0];
+      let $cropper = this.$refs.cropper;
+      $cropper.createImgUrl(e.target.files[0])
+    },
+    cropped(canvas) {
+      this.croppedSrc = canvas.toData
     }
   }
 }
@@ -44,4 +53,7 @@ export default {
   color: #2c3e50;
   margin-top: 60px;
 }
+#app .btn-wrap {width: 300px;margin: 56px auto;text-align: center;}
+#app .btn-wrap .btn {position: relative;display: block;padding: 20px 0;margin-bottom: 15px;border: 2px solid #42b983;color: #42b983;font-size: 16px;text-decoration: none;}
+#app .btn-wrap .btn .file {position: absolute;top: 0;left: 0;right: 0;bottom: 0;opacity: 0;z-index: 1;}
 </style>

@@ -1,6 +1,6 @@
 {
   "name": "vue-cropper-image",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "repository": "MorePainMoreGain/vue-cropper-image",
   "description": "a vue component wrapper for cropperjs",
   "author": "dosir <517441830@qq.com>",
