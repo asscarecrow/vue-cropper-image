@@ -45,6 +45,7 @@
 // import axios from 'axios';
 import Cropper from 'cropperjs';
 require('cropperjs/dist/cropper.css')
+import 'blueimp-canvas-to-blob/js/canvas-to-blob.min.js';/* 增加canvas.toBlob 垫片 */
 // require('css-loader!cropperjs/dist/cropper.css')
 import '../assets/font/iconfont.js';
 /* TODO:

@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "cropperjs": "^1.4.0",
-    "vue": "^2.5.2"
+    "vue": "^2.5.2",
+    "blueimp-canvas-to-blob": "^3.14.0"
   },
   "devDependencies": {
     "autoprefixer": "^7.1.2",
